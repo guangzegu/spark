@@ -931,7 +931,13 @@ public final class VectorizedRleValuesReader extends ValuesReader
           while (valueIndex < this.currentCount) {
             // values are bit packed 8 at a time, so reading bitWidth will always work
             ByteBuffer buffer = in.slice(bitWidth);
-            this.packer.unpack8Values(buffer, buffer.position(), this.currentBuffer, valueIndex);
+            if (buffer.hasArray()) {
+              this.packer.unpack8Values(buffer.array(),
+                      buffer.arrayOffset() + buffer.position(), this.currentBuffer, valueIndex);
+            } else {
+              this.packer.unpack8Values(buffer, buffer.position(), this.currentBuffer, valueIndex);
+            }
+            //this.packer.unpack8Values(buffer, buffer.position(), this.currentBuffer, valueIndex);
             valueIndex += 8;
           }
           break;
